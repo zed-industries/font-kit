@@ -1,9 +1,9 @@
 [package]
 name = "font-kit"
-version = "0.10.0"
+version = "0.11.0"
 authors = ["Patrick Walton <pcwalton@mimiga.net>"]
 description = "A cross-platform font loading library"
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/servo/font-kit"
 homepage = "https://github.com/servo/font-kit"
@@ -14,7 +14,8 @@ edition = "2018"
 default = ["source"]
 loader-freetype = ["freetype"]
 loader-freetype-default = ["loader-freetype"]
-source-fontconfig = ["servo-fontconfig"]
+source-fontconfig = ["yeslogic-fontconfig-sys"]
+source-fontconfig-dlopen = ["yeslogic-fontconfig-sys/dlopen"]
 source-fontconfig-default = ["source-fontconfig"]
 source = []
 
@@ -26,21 +27,21 @@ lazy_static = "1.1"
 libc = "0.2"
 log = "0.4.4"
 pathfinder_geometry = "0.5"
-pathfinder_simd = "0.5"
+pathfinder_simd = "0.5.1"
 
 [dependencies.freetype]
 version = "0.7"
 optional = true
 
-[dependencies.servo-fontconfig]
-version = "0.5"
+[dependencies.yeslogic-fontconfig-sys]
+version = "3.0.0"
 optional = true
 
 [dev-dependencies]
 clap = "2.32"
 colored = "1.6"
 pbr = "1.0"
-prettytable-rs = "0.8"
+prettytable-rs = "0.10"
 
 [target.'cfg(target_family = "windows")'.dependencies]
 dwrote = { version = "0.11", default-features = false }
@@ -58,7 +59,7 @@ core-text = "19.1.0"
 freetype = "0.7"
 
 [target.'cfg(not(any(target_family = "windows", target_os = "macos", target_os = "ios", target_arch = "wasm32")))'.dependencies]
-servo-fontconfig = "0.5"
+yeslogic-fontconfig-sys = "3.0.0"
 
 [target.'cfg(not(any(target_arch = "wasm32", target_family = "windows", target_os = "android")))'.dependencies]
 dirs-next = "2.0"

@@ -359,14 +359,14 @@ impl Font {
                 _ => Style::Normal,
             };
             let stretch = match os2_table {
-                Some(os2_table) if (*os2_table).usWidthClass > 0 => {
+                Some(os2_table) if (1..=9).contains(&(*os2_table).usWidthClass) => {
                     Stretch(Stretch::MAPPING[((*os2_table).usWidthClass as usize) - 1])
                 }
                 _ => Stretch::NORMAL,
             };
             let weight = match os2_table {
                 None => Weight::NORMAL,
-                Some(os2_table) => Weight((*os2_table).usWeightClass as u32 as f32),
+                Some(os2_table) => Weight((*os2_table).usWeightClass as f32),
             };
             Properties {
                 style,
@@ -1198,7 +1198,7 @@ impl FtFixedToF32 for RectI {
     type Output = RectF;
     #[inline]
     fn ft_fixed_26_6_to_f32(self) -> RectF {
-        (self.to_f32() * (1.0 / 64.0))
+        self.to_f32() * (1.0 / 64.0)
     }
 }
 
