@@ -160,7 +160,8 @@ impl Font {
 
     /// Creates a font from a native API handle.
     #[inline]
-    pub unsafe fn from_native_font(native_font: NativeFont) -> Font {
+    pub unsafe fn from_native_font(native_font: &NativeFont) -> Font {
+        let native_font = native_font.clone();
         Font {
             dwrite_font: native_font.dwrite_font,
             dwrite_font_face: native_font.dwrite_font_face,
@@ -747,7 +748,7 @@ impl Loader for Font {
     }
 
     #[inline]
-    unsafe fn from_native_font(native_font: Self::NativeFont) -> Self {
+    unsafe fn from_native_font(native_font: &Self::NativeFont) -> Self {
         Font::from_native_font(native_font)
     }
 

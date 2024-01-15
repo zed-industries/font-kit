@@ -154,12 +154,6 @@ fn css_stretchiness_to_core_text_width(css_stretchiness: Stretch) -> f32 {
     0.25 * core_text_loader::piecewise_linear_find_index(css_stretchiness, &Stretch::MAPPING) - 1.0
 }
 
-#[derive(Clone)]
-struct FontDataInfo {
-    data: Arc<Vec<u8>>,
-    file_type: FileType,
-}
-
 fn create_handles_from_core_text_collection(
     collection: CTFontCollection,
 ) -> Result<Vec<Handle>, SelectionError> {
@@ -169,8 +163,8 @@ fn create_handles_from_core_text_collection(
             let descriptor = descriptors.get(index).unwrap();
             let native = new_from_descriptor(&descriptor, 16.);
             let font = unsafe { Font::from_core_text_font_no_path(native.clone()) };
-            todo!();
-            //fonts.push(Handle::from(font));
+
+            fonts.push(Handle::from_native(&font));
         }
     }
     if fonts.is_empty() {

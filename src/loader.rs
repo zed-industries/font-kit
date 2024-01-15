@@ -15,6 +15,7 @@ use log::warn;
 use pathfinder_geometry::rect::{RectF, RectI};
 use pathfinder_geometry::transform2d::Transform2F;
 use pathfinder_geometry::vector::Vector2F;
+use std::convert::TryFrom;
 use std::sync::Arc;
 
 use crate::canvas::{Canvas, RasterizationOptions};
@@ -35,7 +36,7 @@ use std::path::Path;
 /// fonts.
 pub trait Loader: Clone + Sized {
     /// The handle that the API natively uses to represent a font.
-    type NativeFont;
+    type NativeFont: 'static + Send + Sync;
 
     /// Loads a font from raw font data (the contents of a `.ttf`/`.otf`/etc. file).
     ///
@@ -63,22 +64,23 @@ pub trait Loader: Clone + Sized {
     }
 
     /// Creates a font from a native API handle.
-    unsafe fn from_native_font(native_font: Self::NativeFont) -> Self;
+    unsafe fn from_native_font(native_font: &Self::NativeFont) -> Self;
 
     /// Loads the font pointed to by a handle.
     fn from_handle(handle: &Handle) -> Result<Self, FontLoadingError> {
-        match *handle {
-            Handle::Memory {
-                ref bytes,
-                font_index,
-            } => Self::from_bytes((*bytes).clone(), font_index),
+        match handle {
+            Handle::Memory { bytes, font_index } => Self::from_bytes((*bytes).clone(), *font_index),
             #[cfg(not(target_arch = "wasm32"))]
-            Handle::Path {
-                ref path,
-                font_index,
-            } => Self::from_path(path, font_index),
+            Handle::Path { path, font_index } => Self::from_path(path, *font_index),
             #[cfg(target_arch = "wasm32")]
             Handle::Path { .. } => Err(FontLoadingError::NoFilesystem),
+            Handle::Native { .. } => {
+                if let Some(native) = handle.native_as::<Self::NativeFont>() {
+                    unsafe { Ok(Self::from_native_font(native)) }
+                } else {
+                    Err(FontLoadingError::UnknownFormat)
+                }
+            }
         }
     }
 
