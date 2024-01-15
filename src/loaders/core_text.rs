@@ -123,9 +123,15 @@ impl Font {
 
     /// Creates a font from a native API handle.
     pub unsafe fn from_native_font(core_text_font: NativeFont) -> Font {
-        Font::from_core_text_font(core_text_font)
+        Font::from_core_text_font_no_path(core_text_font)
     }
-
+    /// Creates a font from a native API handle, without performing a lookup on the disk.
+    pub unsafe fn from_core_text_font_no_path(core_text_font: NativeFont) -> Font {
+        Font {
+            core_text_font,
+            font_data: FontData::Unavailable,
+        }
+    }
     unsafe fn from_core_text_font(core_text_font: NativeFont) -> Font {
         let mut font_data = FontData::Unavailable;
         match core_text_font.url() {
@@ -153,7 +159,10 @@ impl Font {
     /// This function is only available on the Core Text backend.
     pub fn from_core_graphics_font(core_graphics_font: CGFont) -> Font {
         unsafe {
-            Font::from_core_text_font(core_text::font::new_from_CGFont(&core_graphics_font, 16.0))
+            Font::from_core_text_font_no_path(core_text::font::new_from_CGFont(
+                &core_graphics_font,
+                16.0,
+            ))
         }
     }
 
