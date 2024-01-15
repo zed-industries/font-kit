@@ -15,7 +15,6 @@ use log::warn;
 use pathfinder_geometry::rect::{RectF, RectI};
 use pathfinder_geometry::transform2d::Transform2F;
 use pathfinder_geometry::vector::Vector2F;
-use std::convert::TryFrom;
 use std::sync::Arc;
 
 use crate::canvas::{Canvas, RasterizationOptions};
