@@ -35,7 +35,7 @@ use std::path::Path;
 /// fonts.
 pub trait Loader: Clone + Sized {
     /// The handle that the API natively uses to represent a font.
-    type NativeFont: 'static + Send + Sync;
+    type NativeFont: 'static;
 
     /// Loads a font from raw font data (the contents of a `.ttf`/`.otf`/etc. file).
     ///

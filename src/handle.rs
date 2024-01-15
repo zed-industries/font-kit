@@ -50,7 +50,7 @@ pub enum Handle {
     /// An already-loaded font.
     Native {
         /// Type-erased font storage. Use [`Self::from_native`] to retrieve the font object.
-        inner: Arc<dyn Any + Send + Sync>,
+        inner: Arc<dyn Any + Sync + Send>,
     },
 }
 
@@ -74,7 +74,10 @@ impl Handle {
     }
 
     /// Creates a new handle from a system handle.
-    pub fn from_native<T: Loader>(inner: &T) -> Self {
+    pub fn from_native<T: Loader>(inner: &T) -> Self
+    where
+        T::NativeFont: Sync + Send,
+    {
         Self::Native {
             inner: Arc::new(inner.native_font()),
         }
@@ -82,7 +85,7 @@ impl Handle {
     /// Retrieves a handle to the font object.
     ///
     /// May return None if inner object is not of type `T` or if this handle does not contain a native font object.
-    pub fn native_as<T: 'static + Send + Sync>(&self) -> Option<&T> {
+    pub fn native_as<T: 'static>(&self) -> Option<&T> {
         if let Self::Native { inner } = self {
             inner.downcast_ref()
         } else {
