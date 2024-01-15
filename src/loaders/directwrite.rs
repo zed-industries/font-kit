@@ -61,6 +61,7 @@ const OPENTYPE_TABLE_TAG_HEAD: u32 = 0x68656164;
 
 /// DirectWrite's representation of a font.
 #[allow(missing_debug_implementations)]
+#[derive(Clone)]
 pub struct NativeFont {
     /// The native DirectWrite font object.
     pub dwrite_font: DWriteFont,
