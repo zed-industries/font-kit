@@ -43,6 +43,7 @@ macro_rules! match_handle {
                     font_index, $index
                 );
             }
+            Handle::Native { .. } => {}
         }
     };
 }
