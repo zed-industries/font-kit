@@ -39,7 +39,7 @@ jobs:
 
   ci-macos:
     name: CI (macOS)
-    runs-on: macos-10.15
+    runs-on: macos-12
     steps:
       - uses: actions/checkout@v2
         with:
