@@ -19,10 +19,8 @@ use core_text::font_collection::{self, CTFontCollection};
 use core_text::font_descriptor::{self, CTFontDescriptor};
 use core_text::font_manager;
 use std::any::Any;
-use std::collections::HashMap;
 use std::f32;
 use std::fs::File;
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::error::SelectionError;
