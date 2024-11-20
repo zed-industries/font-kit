@@ -766,7 +766,7 @@ pub fn rasterize_glyph_with_full_hinting() {
             RasterizationOptions::Bilevel,
         )
         .unwrap();
-    let origin = -raster_rect.origin().to_f32();
+    let origin: Vector2F = -raster_rect.origin().to_f32();
     let mut canvas = Canvas::new(raster_rect.size(), Format::A8);
     font.rasterize_glyph(
         &mut canvas,
@@ -794,6 +794,60 @@ pub fn rasterize_glyph_with_full_hinting() {
         assert!(bottom_row.iter().any(|&value| value == 0xff));
         break;
     }
+}
+
+// https://github.com/servo/font-kit/issues/252
+// Panic when targeting Canvas larger than glyph with SubpixelAa option in Freetype.
+#[cfg(all(
+    feature = "source",
+    any(
+        not(any(target_os = "macos", target_os = "ios", target_family = "windows")),
+        feature = "loader-freetype-default"
+    )
+))]
+#[test]
+pub fn rasterize_glyph_with_full_hinting_subpixel() {
+    let font = SystemSource::new()
+        .select_best_match(&[FamilyName::SansSerif], &Properties::new())
+        .unwrap()
+        .load()
+        .unwrap();
+    let glyph_id = font.glyph_for_char('L').unwrap();
+    let size = 32.0;
+    let raster_rect = font
+        .raster_bounds(
+            glyph_id,
+            size,
+            Transform2F::default(),
+            HintingOptions::Full(size),
+            RasterizationOptions::SubpixelAa,
+        )
+        .unwrap();
+    let origin: Vector2F = -raster_rect.origin().to_f32();
+    let mut canvas = Canvas::new(raster_rect.size(), Format::Rgb24);
+    font.rasterize_glyph(
+        &mut canvas,
+        glyph_id,
+        size,
+        Transform2F::from_translation(origin),
+        HintingOptions::Full(size),
+        RasterizationOptions::SubpixelAa,
+    )
+    .unwrap();
+    check_L_shape(&canvas);
+
+    // Test with larger canvas
+    let mut canvas = Canvas::new(Vector2I::new(100, 100), Format::Rgb24);
+    font.rasterize_glyph(
+        &mut canvas,
+        glyph_id,
+        size,
+        Transform2F::from_translation(origin),
+        HintingOptions::Full(size),
+        RasterizationOptions::SubpixelAa,
+    )
+    .unwrap();
+    check_L_shape(&canvas);
 }
 
 #[cfg(all(feature = "source", target_family = "windows"))]
